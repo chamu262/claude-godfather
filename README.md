@@ -19,7 +19,7 @@ one place, and gives Claude a short set of rules (skills) for running many sessi
 Needs Node 18+ and bash. No packages to install.
 
 ```bash
-git clone https://github.com/chamu262/godfather.git && cd godfather
+git clone https://github.com/chamu262/claude-godfather.git && cd claude-godfather
 ```
 
 ```bash
