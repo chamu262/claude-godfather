@@ -16,8 +16,10 @@
     <a href="#tasks">Tasks &amp; collisions</a>
     <a href="#setup">Setup</a>
   </nav>
+  <div class="tools"><input id="q" type="search" placeholder="Search sessions  ( / )" aria-label="Search sessions"><button id="notify" type="button">Notify me</button></div>
 </header>
 <main id="view"><p class="muted">Loading…</p></main>
-<script src="app.js"></script>
+<div id="toasts" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
 </body>
 </html>

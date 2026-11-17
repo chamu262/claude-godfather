@@ -30,3 +30,15 @@ test('install keeps existing files unless --force', () => {
   run(home, '--force');
   assert.notEqual(fs.readFileSync(f, 'utf8'), 'mine');
 });
+
+test('install --check reports missing pieces, then ok after install', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'gf-check-'));
+  let out = '';
+  try { run(home, '--check'); assert.fail('should exit 1 before install'); } catch (e) { out = e.stdout; assert.equal(e.status, 1); }
+  assert.match(out, /missing\s+skill godfather/);
+  run(home);
+  out = run(home, '--check');
+  assert.match(out, /ok\s+skill godfather/);
+  assert.doesNotMatch(out, /missing/);
+  assert.equal(fs.readdirSync(home).sort().join(','), 'godfather,skills', '--check writes nothing');
+});

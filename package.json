@@ -8,6 +8,8 @@
   "scripts": {
     "start": "node dashboard/server.mjs",
     "demo": "node dashboard/server.mjs --demo",
-    "test": "node --test tests/"
+    "test": "node --test tests/",
+    "check": "bash install.sh --check",
+    "wait-idle": "node scripts/wait-idle.mjs"
   }
 }

@@ -18,6 +18,11 @@ A **worktree** is a second checkout of the same git repo on its own branch, so t
 - Off-topic request mid-task? Hand the current task off (the `session-handoff` skill) and answer the new one.
 - Context getting big (the dashboard flags over 5M tokens re-read)? Hand off with a short brief.
 
+## Finished work
+
+- When a worker finishes, the dashboard marks it **new** until you open it. Clear the "new" list before starting more work.
+- Before housekeeping (archiving, cleaning worktrees, updating skills), wait until nothing is working: `npm run wait-idle`.
+
 ## Reports
 
 - Start the final message with what changed: commit hash or PR link.

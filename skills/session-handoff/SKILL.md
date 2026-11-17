@@ -23,6 +23,9 @@ A brief is the only context the new session gets. Include:
 4. **Rules**: anything the new session must not do (push, delete, touch other files).
 5. **Report back**: what to put in the final message (start with the commit or PR link).
 
+The dashboard drafts this for you: open the session, press **Draft handover brief**, then trim it.
+It fills in goal, last exchange, done and open plan steps, files changed, skills used and the last 5 commits.
+
 Keep it under 300 words. Write it in your own words, not "see above".
 
 ## After

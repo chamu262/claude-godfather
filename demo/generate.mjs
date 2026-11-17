@@ -9,15 +9,32 @@ export const DEMO_NOW = new Date('2026-03-12T15:00:00Z');
 function rng(seed) { return () => ((seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31); }
 
 const SESSIONS = [
-  { project: 'home-hq', title: 'Godfather: morning status board', model: 'claude-opus-4-5', ageMin: 2, last: 'user', days: 9, scale: 9, files: ['~/hq/CLAUDE.md'], todos: [['Review overnight sessions', 'completed'], ['Archive finished work', 'in_progress'], ['Update skills index', 'pending']] },
-  { project: 'acme-web', title: 'Add dark mode to settings page', model: 'claude-sonnet-4-5', ageMin: 3, last: 'user', days: 4, scale: 6, files: ['src/theme.css', 'src/settings/Page.tsx'], todos: [['Add colour tokens', 'completed'], ['Wire toggle', 'in_progress'], ['Screenshot both themes', 'pending']] },
+  { project: 'home-hq', title: 'Godfather: morning status board', model: 'claude-opus-4-5', ageMin: 2, last: 'user', skill: 'godfather', pending: true, days: 9, scale: 9, files: ['~/hq/CLAUDE.md'], todos: [['Review overnight sessions', 'completed'], ['Archive finished work', 'in_progress'], ['Update skills index', 'pending']] },
+  { project: 'acme-web', title: 'Add dark mode to settings page', model: 'claude-sonnet-4-5', ageMin: 3, last: 'assistant', skill: 'session-handoff', days: 4, scale: 6, files: ['src/theme.css', 'src/settings/Page.tsx'], todos: [['Add colour tokens', 'completed'], ['Wire toggle', 'in_progress'], ['Screenshot both themes', 'pending']] },
   { project: 'acme-web', title: 'Fix flaky login test', model: 'claude-sonnet-4-5', ageMin: 40, last: 'assistant', days: 2, scale: 3, files: ['src/settings/Page.tsx', 'tests/login.spec.ts'], todos: [['Reproduce flake', 'completed'], ['Pick fix approach', 'pending']] },
-  { project: 'garden-api', title: 'Plan v2 sensor schema', model: 'claude-opus-4-5', ageMin: 180, last: 'assistant', days: 6, scale: 12, files: ['docs/schema.md', 'api/models.py'], todos: [['Draft schema', 'completed'], ['Migration plan', 'pending']] },
+  { project: 'garden-api', title: 'Plan v2 sensor schema', model: 'claude-opus-4-5', ageMin: 180, last: 'assistant', days: 6, scale: 12, skill: 'tidy-memory', files: ['docs/schema.md', 'api/models.py'], todos: [['Draft schema', 'completed'], ['Migration plan', 'pending']] },
   { project: 'garden-api', title: 'Bump dependencies', model: 'claude-haiku-4-5', ageMin: 60 * 30, last: 'assistant', days: 1, scale: 1, files: ['requirements.txt'], todos: [] },
   { project: 'notes-app', title: 'What does the sync flag do?', model: 'claude-opus-4-5', ageMin: 60 * 50, last: 'assistant', days: 1, scale: 0.3, files: [], todos: [], turns: 1 },
   { project: 'notes-app', title: 'Offline mode spike', model: 'claude-sonnet-4-5', ageMin: 60 * 24 * 3, last: 'assistant', days: 5, scale: 4, files: ['app/sync.ts', 'app/store.ts'], todos: [['Spike IndexedDB cache', 'completed']] },
   { project: 'home-hq', title: 'Write weekly review skill', model: 'claude-sonnet-4-5', ageMin: 60 * 24 * 10, last: 'assistant', days: 3, scale: 2, files: ['skills/weekly-review/SKILL.md'], todos: [] },
   { project: 'acme-web', title: 'Old migration experiment', model: 'claude-sonnet-4-5', ageMin: 60 * 24 * 20, last: 'assistant', days: 2, scale: 2, files: ['db/migrate.sql'], todos: [] },
+];
+
+const PROMPTS = [
+  'Carry on with the next step',
+  'Run the tests and tell me what fails',
+  'Why did that break? Keep it short',
+  'Good. Commit it, but do not push',
+  'Can you check the edge case with an empty list?',
+  'Write a short note for the README about this',
+];
+const REPLIES = [
+  'Updated {file}. The change is small and the tests pass.',
+  'Found it: the timeout in {file} was shorter than the retry delay, so the second try never ran.',
+  'I read {file} first. Nothing else depends on it, so the change is safe.',
+  'Tests: 41 passed, 0 failed. Committed locally; nothing pushed.',
+  'An empty list now returns an empty result instead of an error. Added a test in {file}.',
+  'Added two sentences to the README in plain words.',
 ];
 
 function transcript(def, i, now) {
@@ -28,20 +45,31 @@ function transcript(def, i, now) {
   const turns = def.turns || Math.max(2, Math.round(def.days * 6));
   const span = def.days * 24 * 3600 * 1000;
   for (let t = 0; t < turns; t++) {
-    const at = new Date(end - span * (1 - t / turns));
+    const at = new Date(end - span * (1 - (t + 1) / turns) - 60000);
     const base = { sessionId: id, cwd: `~/code/${def.project}`, timestamp: at.toISOString() };
-    lines.push({ ...base, type: 'user', message: { role: 'user', content: t === 0 ? def.title : `Step ${t}: carry on` } });
-    const content = [{ type: 'text', text: 'Working on it.' }];
-    if (def.files.length) content.push({ type: 'tool_use', name: 'Edit', input: { file_path: def.files[t % def.files.length] } });
-    if (t % 5 === 4) content.push({ type: 'tool_use', name: 'Agent', input: { description: 'search' } });
-    if (t === turns - 1 && def.todos.length) content.push({ type: 'tool_use', name: 'TodoWrite', input: { todos: def.todos.map(([c, s]) => ({ content: c, status: s })) } });
+    const prompt = t === 0 ? def.title : PROMPTS[(i + t) % PROMPTS.length];
+    lines.push({ ...base, type: 'user', message: { role: 'user', content: prompt } });
+    const file = def.files[t % (def.files.length || 1)];
+    const content = [{ type: 'text', text: REPLIES[(i * 3 + t) % REPLIES.length].replace('{file}', file || 'the notes') }];
+    const uses = [];
+    if (file) uses.push({ type: 'tool_use', id: `${id}-e${t}`, name: 'Edit', input: { file_path: file } });
+    if (t % 5 === 4) uses.push({ type: 'tool_use', id: `${id}-a${t}`, name: 'Agent', input: { description: 'search the codebase' } });
+    if (t === 1 && def.skill) uses.push({ type: 'tool_use', id: `${id}-s${t}`, name: 'Skill', input: { skill: def.skill } });
+    if (t === turns - 1 && def.todos.length) uses.push({ type: 'tool_use', id: `${id}-t${t}`, name: 'TodoWrite', input: { todos: def.todos.map(([c, s]) => ({ content: c, status: s })) } });
     const k = def.scale * (0.6 + r());
     lines.push({ ...base, timestamp: new Date(+at + 30000).toISOString(), type: 'assistant', message: {
-      role: 'assistant', model: def.model, content,
+      role: 'assistant', model: def.model, content: content.concat(uses),
       usage: { input_tokens: Math.round(900 * k), output_tokens: Math.round(1800 * k), cache_read_input_tokens: Math.round(160000 * k), cache_creation_input_tokens: Math.round(9000 * k) },
     } });
+    if (uses.length) lines.push({ ...base, timestamp: new Date(+at + 40000).toISOString(), type: 'user', message: { role: 'user', content: uses.map(u => ({ type: 'tool_result', tool_use_id: u.id, content: 'ok' })) } });
   }
   if (def.last === 'user') lines.push({ sessionId: id, cwd: `~/code/${def.project}`, type: 'user', timestamp: new Date(+end + 60000).toISOString(), message: { role: 'user', content: 'Looks good, keep going' } });
+  if (def.pending) {
+    const at = new Date(+end + 90000).toISOString();
+    lines.push({ sessionId: id, cwd: `~/code/${def.project}`, type: 'assistant', timestamp: at, message: { role: 'assistant', model: def.model,
+      content: [{ type: 'text', text: 'Checking every session before I archive anything.' }, { type: 'tool_use', id: `${id}-live`, name: 'Bash', input: { command: 'ls' } }],
+      usage: { input_tokens: 400, output_tokens: 300, cache_read_input_tokens: 90000, cache_creation_input_tokens: 2000 } } });
+  }
   lines.push({ type: 'summary', summary: def.title });
   return { id, text: lines.map(l => JSON.stringify(l)).join('\n') + '\n' };
 }

@@ -17,7 +17,7 @@ Masters and the Godfather message each other freely. Any change to the Claude se
 
 ## Start of every Godfather session
 
-1. List sessions and give a short status board in four groups: **working**, **waiting on you**, **failed**, **stale** (no activity for 7 days).
+1. List sessions and give a short status board in groups: **working**, **finished since you last looked**, **waiting on you**, **failed**, **stale** (no activity for 7 days).
 2. Check connector status and scheduled tasks.
 3. Point to the dashboard if it is running: `http://127.0.0.1:4417`.
 
@@ -32,6 +32,8 @@ Masters and the Godfather message each other freely. Any change to the Claude se
 
 ## Housekeeping (on request)
 
+First wait until nothing is working: `npm run wait-idle --prefix <repo>` (exits once every session is idle, or after 10 minutes with the list of busy ones).
+
 - Archive sessions that are finished or stale (show the list first).
 - Clean up worktrees with no uncommitted changes.
 - Group the sidebar by project; keep the Godfather pinned first.
@@ -39,7 +41,7 @@ Masters and the Godfather message each other freely. Any change to the Claude se
 
 ## Set up the Godfather
 
-1. Run `./install.sh` from the godfather repo (or check it already ran: `~/.claude/godfather/` exists).
+1. Run `./install.sh` from the godfather repo, then `./install.sh --check` and fix anything marked missing.
 2. Create a folder for the Godfather (default `~/Godfather`) and copy `templates/CLAUDE.md` into it.
 3. Start a session there, title it "The Godfather" and pin it.
 4. Start the dashboard: `npm start --prefix <repo>` (or `npm run demo` to try it on made-up data).

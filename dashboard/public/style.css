@@ -35,7 +35,26 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .barrow .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tip { padding: 10px 12px; border-left: 3px solid var(--accent); background: #1c2029; border-radius: 6px; margin-bottom: 8px; }
 .tip.act { border-color: var(--waiting); } .tip.tidy { border-color: var(--idle); }
+.kpi .v { white-space: nowrap; }
+td.st { white-space: nowrap; }
 .file { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
 .detail { margin-top: 16px; }
 svg text { fill: var(--muted); font-size: 11px; }
+header .tools { display: flex; gap: 8px; align-items: center; }
+input[type=search] { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 6px 10px; width: 220px; font: inherit; }
+button { background: #232834; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+.row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill.new { background: var(--waiting); color: #111; font-weight: 650; }
+.meter { height: 8px; background: #232834; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.meter > div { height: 100%; background: var(--working); }
+.meter > div.hot { background: var(--waiting); }
+.brief { white-space: pre-wrap; background: #0c0e12; border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-top: 16px; font: 12.5px/1.5 ui-monospace, Menlo, monospace; max-height: 420px; overflow: auto; }
+.snip { margin-top: 6px; color: var(--muted); }
+mark { background: var(--accent); color: #111; border-radius: 3px; padding: 0 2px; }
+.first ol { line-height: 2; }
+#toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 9; }
+.toast { background: var(--panel); border: 1px solid var(--waiting); border-left-width: 4px; padding: 10px 14px; border-radius: 8px; max-width: 360px; box-shadow: 0 6px 24px #0008; }
+@media (max-width: 600px) { input[type=search] { width: 100%; } header .tools { width: 100%; } }
 @media (max-width: 600px) { main, header { padding-left: 16px; padding-right: 16px; } .two { grid-template-columns: 1fr; } .barrow { grid-template-columns: 100px 1fr 60px; } }
