@@ -69,6 +69,7 @@ export function buildDemo(home, now = DEMO_NOW) {
   fs.writeFileSync(path.join(mem, 'MEMORY.md'), memories.map(([n, , d]) => `- [${n}](${n}.md) — ${d}`).join('\n') + '\n');
   const skillsSrc = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'skills');
   for (const name of fs.readdirSync(skillsSrc)) {
+    if (!fs.existsSync(path.join(skillsSrc, name, "SKILL.md"))) continue;
     fs.mkdirSync(path.join(home, 'skills', name), { recursive: true });
     fs.copyFileSync(path.join(skillsSrc, name, 'SKILL.md'), path.join(home, 'skills', name, 'SKILL.md'));
   }
