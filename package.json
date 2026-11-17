@@ -1,0 +1,13 @@
+{
+  "name": "godfather",
+  "version": "1.0.0",
+  "description": "A supervisor setup for Claude Code: skills, memory layout, session conventions and a local dashboard.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node dashboard/server.mjs",
+    "demo": "node dashboard/server.mjs --demo",
+    "test": "node --test tests/"
+  }
+}
